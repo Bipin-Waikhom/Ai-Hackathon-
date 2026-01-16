@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Haksel Info - AI Health Management</title>
+    <link rel="stylesheet" href="style.css" />
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="loginPage" class="page active">
+      <div class="login-container">
+        <div class="card">
+          <h2 style="text-align: center; color: #667eea; margin-bottom: 30px">
+            Haksel Info Login
+          </h2>
+
+          <div id="loginForm">
+            <div class="form-group">
+              <label>Login As</label>
+              <select id="userType">
+                <option value="patient">Patient</option>
+                <option value="doctor">Doctor</option>
+                <option value="admin">Hospital Admin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Email / Phone Number</label>
+              <input
+                type="text"
+                id="username"
+                placeholder="Enter email or phone"
+              />
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                id="password"
+                placeholder="Enter password"
+              />
+            </div>
+            <button class="btn" style="width: 100%" onclick="sendOTP()">
+              Send OTP
+            </button>
+          </div>
+
+          <div id="otpForm" class="hidden">
+            <p style="text-align: center; margin-bottom: 20px">
+              Enter the 6-digit OTP sent to your device
+            </p>
+            <div class="otp-inputs">
+              <input type="text" maxlength="1" class="otp-digit" />
+              <input type="text" maxlength="1" class="otp-digit" />
+              <input type="text" maxlength="1" class="otp-digit" />
+              <input type="text" maxlength="1" class="otp-digit" />
+              <input type="text" maxlength="1" class="otp-digit" />
+              <input type="text" maxlength="1" class="otp-digit" />
+            </div>
+            <button class="btn" style="width: 100%" onclick="verifyOTP()">
+              Verify & Login
+            </button>
+            <button
+              class="btn btn-secondary"
+              style="width: 100%; margin-top: 10px"
+              onclick="backToLogin()"
+            >
+              Back
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="mainApp" class="page">
+      <div class="container">
+        <div class="header">
+          <div>
+            <h1>🏥 Haksel Info</h1>
+            <p style="color: #666">AI-Powered Health Management System</p>
+          </div>
+          <div class="header-info">
+            <p style="font-weight: 600" id="userName">Welcome, User</p>
+            <button
+              class="btn btn-danger"
+              onclick="logout()"
+              style="margin-top: 10px"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <div class="nav-tabs">
+          <button class="tab-btn active" onclick="showPage('dashboard')">
+            Dashboard
+          </button>
+          <button class="tab-btn" id="aiChatTab" onclick="showPage('aiChat')">
+            AI Health Assistant
+          </button>
+          <button
+            class="tab-btn"
+            id="epidemicTab"
+            onclick="showPage('epidemic')"
+          >
+            Epidemic Prediction
+          </button>
+          <button class="tab-btn" id="opdTab" onclick="showPage('opd')">
+            Book OPD
+          </button>
+          <button class="tab-btn" id="recordsTab" onclick="showPage('records')">
+            Medical Records
+          </button>
+          <button class="tab-btn" id="doctorsTab" onclick="showPage('doctors')">
+            Doctors
+          </button>
+          <button
+            class="tab-btn"
+            id="trackingTab"
+            onclick="showPage('tracking')"
+          >
+            Doctor Attendance
+          </button>
+          <button
+            class="tab-btn"
+            id="scheduleTab"
+            onclick="showPage('schedule')"
+          >
+            Schedule Management
+          </button>
+        </div>
+
+        <div id="dashboard" class="page-content active">
+          <div class="grid">
+            <div class="stat-card">
+              <h3 id="totalPatients">1,234</h3>
+              <p>Total Patients</p>
+            </div>
+            <div
+              class="stat-card"
+              style="
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+              "
+            >
+              <h3 id="activeDoctors">45</h3>
+              <p>Active Doctors</p>
+            </div>
+            <div
+              class="stat-card"
+              style="
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+              "
+            >
+              <h3 id="todayAppointments">89</h3>
+              <p>Today's Appointments</p>
+            </div>
+            <div
+              class="stat-card"
+              style="
+                background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+              "
+            >
+              <h3 id="opdAvailable">12</h3>
+              <p>OPD Available</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-bottom: 20px">🎯 AI Risk Assessment</h3>
+            <div class="risk-meter">
+              <div class="risk-level" id="riskLevel" style="width: 35%"></div>
+            </div>
+            <p>
+              <strong>Current Risk Level:</strong>
+              <span style="color: #ffc107">Moderate (35%)</span>
+            </p>
+            <p style="margin-top: 10px">
+              Based on health data, environmental factors, and mobility patterns
+            </p>
+          </div>
+
+          <div id="patientDashboard" class="hidden">
+            <div class="card">
+              <h3>Your Recent Appointments</h3>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Doctor</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Jan 10, 2026</td>
+                    <td>Dr. Sharma</td>
+                    <td>Cardiology</td>
+                    <td><span class="status online">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td>Jan 15, 2026</td>
+                    <td>Dr. Singh</td>
+                    <td>General Medicine</td>
+                    <td><span class="status busy">Today</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="doctorDashboard" class="hidden">
+            <div class="card">
+              <h3>Today's Patient Queue</h3>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Token</th>
+                    <th>Patient Name</th>
+                    <th>Age</th>
+                    <th>Complaint</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>#001</td>
+                    <td>Raj Kumar</td>
+                    <td>45</td>
+                    <td>Fever, Headache</td>
+                    <td><button class="btn btn-success">Consult</button></td>
+                  </tr>
+                  <tr>
+                    <td>#002</td>
+                    <td>Priya Singh</td>
+                    <td>32</td>
+                    <td>Back Pain</td>
+                    <td><button class="btn btn-success">Consult</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="aiChat" class="page-content">
+          <div class="card">
+            <h3 style="margin-bottom: 20px">
+              🤖 Smart Epidemic Detection System
+            </h3>
+            <p style="margin-bottom: 20px; color: #666">
+              Describe your symptoms and get preliminary guidance
+            </p>
+
+            <div class="chat-container" id="chatContainer">
+              <div class="chat-message ai">
+                Hello! I'm your AI Health Assistant. Please describe your
+                symptoms, and I'll help identify the right specialist for you.
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px">
+              <input
+                type="text"
+                id="chatInput"
+                placeholder="Describe your symptoms..."
+                style="
+                  flex: 1;
+                  padding: 12px;
+                  border: 2px solid #e0e0e0;
+                  border-radius: 6px;
+                "
+              />
+              <button class="btn" onclick="sendMessage()">Send</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="epidemic" class="page-content">
+          <div class="card">
+            <h3 style="margin-bottom: 20px">📊 Epidemic Outbreak Prediction</h3>
+            <p style="margin-bottom: 20px; color: #666">
+              AI-powered 7-day disease outbreak forecasting with risk assessment
+            </p>
+
+            <button
+              class="btn"
+              onclick="loadEpidemicPrediction()"
+              style="margin-bottom: 20px"
+            >
+              🔮 Generate Prediction
+            </button>
+
+            <div id="epidemicLoading" class="hidden">
+              <div class="loading-spinner"></div>
+              <p style="text-align: center; margin-top: 10px">
+                Analyzing epidemic data and generating predictions...
+              </p>
+            </div>
+
+            <div id="epidemicResults" class="hidden">
+              <div class="alert success">
+                <strong>✅ Prediction Generated Successfully</strong>
+                <p id="epidemicTimestamp"></p>
+              </div>
+
+              <div class="grid" style="margin-bottom: 20px">
+                <div
+                  class="stat-card"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #667eea 0%,
+                      #764ba2 100%
+                    );
+                  "
+                >
+                  <h3 id="avgRisk">0.45</h3>
+                  <p>Average Risk Score</p>
+                </div>
+                <div
+                  class="stat-card"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #f093fb 0%,
+                      #f5576c 100%
+                    );
+                  "
+                >
+                  <h3 id="highestRiskDay">Day 5</h3>
+                  <p>Highest Risk Day</p>
+                </div>
+                <div
+                  class="stat-card"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #4facfe 0%,
+                      #00f2fe 100%
+                    );
+                  "
+                >
+                  <h3 id="totalCases">3,456</h3>
+                  <p>Predicted Cases (7 days)</p>
+                </div>
+                <div
+                  class="stat-card"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #43e97b 0%,
+                      #38f9d7 100%
+                    );
+                  "
+                >
+                  <h3 id="riskTrend">INCREASING ⚠️</h3>
+                  <p>Risk Trend</p>
+                </div>
+              </div>
+
+              <div
+                id="epidemicChart"
+                style="text-align: center; margin: 20px 0"
+              >
+                <img
+                  id="predictionChart"
+                  src=""
+                  alt="Prediction Chart"
+                  style="
+                    max-width: 100%;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                  "
+                />
+              </div>
+
+              <h4 style="margin: 20px 0">📅 7-Day Detailed Forecast</h4>
+              <div id="predictionTable"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="opd" class="page-content">
+          <div class="card">
+            <h3 style="margin-bottom: 20px">📅 Book OPD Appointment</h3>
+
+            <div class="form-group">
+              <label>Department</label>
+              <select id="department">
+                <option>General Medicine</option>
+                <option>Cardiology</option>
+                <option>Orthopedics</option>
+                <option>Pediatrics</option>
+                <option>Gynecology</option>
+                <option>ENT</option>
+                <option>Dermatology</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Select Doctor</label>
+              <select id="doctorSelect">
+                <option>Dr. R.K. Sharma - General Medicine</option>
+                <option>Dr. Priya Singh - Cardiology</option>
+                <option>Dr. A.K. Patel - Orthopedics</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Preferred Date</label>
+              <input type="date" id="appointmentDate" />
+            </div>
+
+            <div class="form-group">
+              <label>Preferred Time</label>
+              <select id="appointmentTime">
+                <option>09:00 AM - 10:00 AM</option>
+                <option>10:00 AM - 11:00 AM</option>
+                <option>11:00 AM - 12:00 PM</option>
+                <option>02:00 PM - 03:00 PM</option>
+                <option>03:00 PM - 04:00 PM</option>
+                <option>04:00 PM - 05:00 PM</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Chief Complaint</label>
+              <textarea
+                rows="3"
+                placeholder="Briefly describe your symptoms..."
+              ></textarea>
+            </div>
+
+            <button class="btn" onclick="bookAppointment()">
+              Book Appointment
+            </button>
+          </div>
+        </div>
+
+        <div id="records" class="page-content">
+          <div class="card">
+            <h3 style="margin-bottom: 20px">📄 Medical Records</h3>
+
+            <div
+              class="records-upload"
+              onclick="document.getElementById('fileUpload').click()"
+            >
+              <p style="font-size: 48px">📁</p>
+              <p style="font-weight: 600; margin: 10px 0">
+                Upload Medical Records
+              </p>
+              <p style="color: #666">
+                Click to upload reports, prescriptions, or test results
+              </p>
+              <input type="file" id="fileUpload" class="hidden" multiple />
+            </div>
+
+            <h4 style="margin: 30px 0 15px 0">Previous Records</h4>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Document Type</th>
+                  <th>Doctor</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Jan 10, 2026</td>
+                  <td>Blood Test Report</td>
+                  <td>Dr. Sharma</td>
+                  <td><button class="btn btn-secondary">View</button></td>
+                </tr>
+                <tr>
+                  <td>Dec 28, 2025</td>
+                  <td>X-Ray</td>
+                  <td>Dr. Patel</td>
+                  <td><button class="btn btn-secondary">View</button></td>
+                </tr>
+                <tr>
+                  <td>Dec 15, 2025</td>
+                  <td>Prescription</td>
+                  <td>Dr. Singh</td>
+                  <td><button class="btn btn-secondary">View</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="doctors" class="page-content">
+          <div class="card">
+            <h3 style="margin-bottom: 20px">👨‍⚕️ Our Doctors</h3>
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Specialization</th>
+                  <th>Status</th>
+                  <th>Room</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Dr. R.K. Sharma</td>
+                  <td>General Medicine</td>
+                  <td>MD, MBBS</td>
+                  <td><span class="status online">Available</span></td>
+                  <td>Room 101</td>
+                </tr>
+                <tr>
+                  <td>Dr. Priya Singh</td>
+                  <td>Cardiology</td>
+                  <td>MD (Cardio), DM</td>
+                  <td><span class="status busy">Busy</span></td>
+                  <td>Room 205</td>
+                </tr>
+                <tr>
+                  <td>Dr. A.K. Patel</td>
+                  <td>Orthopedics</td>
+                  <td>MS (Ortho)</td>
+                  <td><span class="status online">Available</span></td>
+                  <td>Room 302</td>
+                </tr>
+                <tr>
+                  <td>Dr. Meera Devi</td>
+                  <td>Pediatrics</td>
+                  <td>MD (Pediatrics)</td>
+                  <td><span class="status offline">Off Duty</span></td>
+                  <td>Room 108</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tracking" class="page-content">
+          <div class="card">
+            <h3 style="margin-bottom: 20px">📍 Doctor Attendance</h3>
+
+            <div class="alert warning">
+              <strong>⚠️ Attendance Tracking System</strong><br />
+              Real-time location and video KYC verification for doctor
+              attendance
+            </div>
+
+            <div class="location-tracker">
+              <h4>Dr. R.K. Sharma - General Medicine</h4>
+              <div class="location-status">
+                <div class="location-indicator"></div>
+                <div>
+                  <strong>Current Location:</strong> Room 101<br />
+                  <small>Last updated: 2 minutes ago</small>
+                </div>
+              </div>
+              <div class="video-kyc">
+                📹 Video KYC Stream - Morning Check-in Verified ✓
+              </div>
+              <p><strong>Morning KYC:</strong> ✅ Verified at 08:45 AM</p>
+              <p><strong>Evening KYC:</strong> ⏳ Pending</p>
+            </div>
+
+            <div class="location-tracker" style="margin-top: 20px">
+              <h4>Dr. Priya Singh - Cardiology</h4>
+              <div class="location-status">
+                <div class="location-indicator"></div>
+                <div>
+                  <strong>Current Location:</strong> Room 205<br />
+                  <small>Last updated: 1 minute ago</small>
+                </div>
+              </div>
+              <div class="video-kyc">
+                📹 Video KYC Stream - Active Consultation
+              </div>
+              <p><strong>Morning KYC:</strong> ✅ Verified at 08:52 AM</p>
+              <p><strong>Evening KYC:</strong> ⏳ Pending</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="schedule" class="page-content">
+          <div class="card">
+            <h3 style="margin-bottom: 20px">📆 Weekly Doctor Schedule</h3>
+
+            <div class="alert success">
+              <strong>✅ Auto-Alert System Active</strong><br />
+              Automatic notifications for doctor room assignments and
+              availability
+            </div>
+
+            <h4 style="margin: 20px 0">Dr. R.K. Sharma - General Medicine</h4>
+            <div class="doctor-schedule">
+              <div class="day-schedule">
+                <h4>Sunday</h4>
+                <div class="time-slot">09:00 AM - 01:00 PM</div>
+                <div class="time-slot">Room 101</div>
+              </div>
+              <div class="day-schedule">
+                <h4>Monday</h4>
+                <div class="time-slot">09:00 AM - 02:00 PM</div>
+                <div class="time-slot">Room 101</div>
+              </div>
+              <div class="day-schedule">
+                <h4>Tuesday</h4>
+                <div class="time-slot">09:00 AM - 02:00 PM</div>
+                <div class="time-slot">Room 101</div>
+              </div>
+              <div class="day-schedule">
+                <h4>Wednesday</h4>
+                <div class="time-slot">09:00 AM - 02:00 PM</div>
+                <div class="time-slot">Room 101</div>
+              </div>
+              <div class="day-schedule">
+                <h4>Thursday</h4>
+                <div class="time-slot">09:00 AM - 02:00 PM</div>
+                <div class="time-slot">Room 101</div>
+              </div>
+              <div class="day-schedule">
+                <h4>Friday</h4>
+                <div class="time-slot">09:00 AM - 02:00 PM</div>
+                <div class="time-slot">Room 101</div>
+              </div>
+              <div class="day-schedule">
+                <h4>Saturday</h4>
+                <div class="time-slot">09:00 AM - 01:00 PM</div>
+                <div class="time-slot">Room 101</div>
+              </div>
+            </div>
+
+            <div class="alert warning" style="margin-top: 20px">
+              <strong>🔔 Upcoming Alert</strong><br />
+              Dr. Sharma - Room 101 - Today 09:00 AM to 02:00 PM
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
