@@ -154,7 +154,7 @@ function sendMessage() {
 
         if (response.matched_symptoms.length > 0) {
           responseHTML += `<strong>Detected Symptoms:</strong> ${response.matched_symptoms.join(
-            ", "
+            ", ",
           )}<br><br>`;
         }
 
@@ -200,72 +200,6 @@ function loadEpidemicPrediction() {
   document.getElementById("epidemicResults").classList.add("hidden");
 
   // Call API
-  $.ajax({
-    url: "http://localhost:5000/api/epidemic/predict",
-    type: "GET",
-    success: function (response) {
-      document.getElementById("epidemicLoading").classList.add("hidden");
-
-      if (response.success) {
-        document.getElementById("epidemicResults").classList.remove("hidden");
-
-        // Update summary stats
-        document.getElementById("avgRisk").textContent =
-          response.summary.average_risk.toFixed(3);
-        document.getElementById(
-          "highestRiskDay"
-        ).textContent = `Day ${response.summary.highest_risk_day}`;
-        document.getElementById("totalCases").textContent =
-          response.summary.total_predicted_cases.toLocaleString();
-        document.getElementById("riskTrend").textContent =
-          response.summary.risk_trend;
-        document.getElementById(
-          "epidemicTimestamp"
-        ).textContent = `Generated at: ${response.timestamp}`;
-
-        // Display chart
-        document.getElementById("predictionChart").src = response.visualization;
-
-        // Create prediction table
-        let tableHTML = '<table class="table"><thead><tr>';
-        tableHTML +=
-          "<th>Day</th><th>Date</th><th>Cases</th><th>Risk</th><th>Level</th>";
-        tableHTML +=
-          "<th>Hosp %</th><th>Death %</th><th>AQI</th></tr></thead><tbody>";
-
-        response.predictions.forEach((pred) => {
-          tableHTML += "<tr>";
-          tableHTML += `<td>Day ${pred.day}</td>`;
-          tableHTML += `<td>${pred.date}</td>`;
-          tableHTML += `<td>${pred.predicted_cases.toLocaleString()}</td>`;
-          tableHTML += `<td>${pred.risk_score.toFixed(3)}</td>`;
-          tableHTML += `<td>${pred.risk_icon} ${pred.risk_level}</td>`;
-          tableHTML += `<td>${pred.hospitalization_rate}%</td>`;
-          tableHTML += `<td>${pred.death_rate}%</td>`;
-          tableHTML += `<td>${pred.air_quality_index}</td>`;
-          tableHTML += "</tr>";
-        });
-
-        tableHTML += "</tbody></table>";
-        document.getElementById("predictionTable").innerHTML = tableHTML;
-
-        // Scroll to results
-        document
-          .getElementById("epidemicResults")
-          .scrollIntoView({ behavior: "smooth" });
-      } else {
-        alert("Error: " + response.error);
-      }
-    },
-    error: function (xhr, status, error) {
-      document.getElementById("epidemicLoading").classList.add("hidden");
-      alert(
-        "⚠️ Unable to connect to the server. Please ensure the Flask API is running on http://localhost:5000\n\nError: " +
-          error
-      );
-      console.log("Error:", error);
-    },
-  });
 }
 
 function bookAppointment() {
@@ -280,7 +214,7 @@ function bookAppointment() {
   }
 
   alert(
-    `Appointment booked successfully!\n\nDepartment: ${department}\nDoctor: ${doctor}\nDate: ${date}\nTime: ${time}\n\nYou will receive a confirmation SMS/Email shortly.`
+    `Appointment booked successfully!\n\nDepartment: ${department}\nDoctor: ${doctor}\nDate: ${date}\nTime: ${time}\n\nYou will receive a confirmation SMS/Email shortly.`,
   );
 }
 
